@@ -38,6 +38,7 @@ browser.on('deviceOn', function(device){
 
   })
 })
+browser.search();
 
 ```
 
@@ -53,6 +54,7 @@ var browser = new chromecastjs.Browser()
 
 var media = {
     url : 'http://commondatastorage.googleapis.com/gtv-videos-bucket/big_buck_bunny_1080p.mp4',
+    type: 'video/mp4',
     subtitles: [{
         language: 'en-US',
         url: 'http://carlosguerrero.com/captions_styled.vtt',
@@ -204,6 +206,5 @@ browser.on('deviceOn', function(device){
     })
   })
 }
-
+browser.search();
 ```
-
