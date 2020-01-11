@@ -44,7 +44,7 @@ Device.prototype.connect = function(callback) {
     });
   });
 
-  this.client.on('error', function(err) {
+  self.client.on('error', function(err) {
     debug('Error: %s', err.message);
     self.connect(self.host);
     self.client.close();
@@ -65,7 +65,7 @@ Device.prototype.play = function(resource, n, callback) {
   if (typeof resource !== 'string') {
     media = {
       contentId: resource.url,
-      contentType: 'video/mp4',
+      contentType: resource.type,
     };
     if (resource.subtitles) {
       var i = 0;
@@ -220,6 +220,10 @@ Device.prototype.changeSubtitlesSize = function(num, callback) {
 };
 
 Device.prototype.close = function(callback) {
+  if ( this.player ) {
+    this.player.close();
+    this.player == null;
+  }
   if (this.client) {
     this.client.close();
     this.client = null;

@@ -21,8 +21,8 @@ Browser.prototype.update = function(device) {
 Browser.prototype.init = function() {
   var _this = this;
 
-  var ssdpBrowser = new SsdpClient();
-  ssdpBrowser.on('response', function(headers, statusCode, rinfo) {
+  this.ssdpBrowser = new SsdpClient();
+  this.ssdpBrowser.on('response', function(headers, statusCode, rinfo) {
     if (statusCode !== 200 || !headers.LOCATION) {
       return;
     }
@@ -32,6 +32,8 @@ Browser.prototype.init = function() {
         body += chunk;
       });
       res.on('end', function() {
+        if (body.search('<manufacturer>Google Inc.</manufacturer>') == -1)
+                return;
         var match = body.match(/<friendlyName>(.+?)<\/friendlyName>/);
         if (!match || match.length !== 2) {
           return;
@@ -40,8 +42,15 @@ Browser.prototype.init = function() {
       });
     });
   });
-  ssdpBrowser.search('urn:dial-multiscreen-org:service:dial:1');
 };
+
+Browser.prototype.search = function() {
+  if(this.ssdpBrowser == null) {
+    console.log("You have not initialized the browser");
+    return;
+  }
+  this.ssdpBrowser.search('urn:dial-multiscreen-org:service:dial:1');
+}
 
 util.inherits(Browser, events.EventEmitter);
 
