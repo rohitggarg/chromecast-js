@@ -17,7 +17,7 @@ Device.prototype.connect = function(callback) {
 
   // Always use a fresh client when connecting
   if (self.client) {
-    self.client.close();
+    self.close();
   }
 
   self.client = new Client();
@@ -28,26 +28,24 @@ Device.prototype.connect = function(callback) {
         debug(err);
       } else {
         self.player = player;
+        player.on('status', function(status) {
+          if (status) {
+            debug('status broadcast playerState=%s', status.playerState);
+          } else {
+            debug('-');
+          }
+        });
         self.emit('connected');
         if (callback) {
           callback();
         }
       }
-
-      player.on('status', function(status) {
-        if (status) {
-          debug('status broadcast playerState=%s', status.playerState);
-        } else {
-          debug('-');
-        }
-      });
     });
   });
 
   self.client.on('error', function(err) {
     debug('Error: %s', err.message);
-    self.connect(self.host);
-    self.client.close();
+    self.close();
   });
 };
 
@@ -222,7 +220,7 @@ Device.prototype.changeSubtitlesSize = function(num, callback) {
 Device.prototype.close = function(callback) {
   if ( this.player ) {
     this.player.close();
-    this.player == null;
+    this.player = null;
   }
   if (this.client) {
     this.client.close();
