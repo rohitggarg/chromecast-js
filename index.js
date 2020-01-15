@@ -6,6 +6,7 @@ var util = require('util');
 
 var Device = require('./device').Device;
 var SsdpClient = require('node-ssdp').Client;
+var debug = require('debug')('Browser');
 
 function Browser(options) {
   events.EventEmitter.call(this);
@@ -46,7 +47,7 @@ Browser.prototype.init = function() {
 
 Browser.prototype.search = function() {
   if(this.ssdpBrowser == null) {
-    console.log("You have not initialized the browser");
+    debug("You have not initialized the browser");
     return;
   }
   this.ssdpBrowser.search('urn:dial-multiscreen-org:service:dial:1');

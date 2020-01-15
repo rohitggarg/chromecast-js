@@ -17,12 +17,16 @@ Device.prototype.connect = function(callback) {
 
   // Always use a fresh client when connecting
   if (self.client) {
-    self.close();
+    self.client.close();
   }
 
   self.client = new Client();
   self.client.connect(self.host, function() {
-    debug('connected, launching app ...');
+    if (!callback) {
+      debug('no callback, not launching app...')
+      return;
+    }
+    debug('connected, launching app...');
     self.client.launch(DefaultMediaReceiver, function(err, player) {
       if (err) {
         debug(err);
@@ -45,7 +49,7 @@ Device.prototype.connect = function(callback) {
 
   self.client.on('error', function(err) {
     debug('Error: %s', err.message);
-    self.close();
+    setTimeout(self.connect, 100);
   });
 };
 
