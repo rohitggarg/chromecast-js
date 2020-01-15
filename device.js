@@ -17,15 +17,12 @@ Device.prototype.connect = function(callback) {
 
   // Always use a fresh client when connecting
   if (self.client) {
+    debug('closing existing client');
     self.client.close();
   }
 
   self.client = new Client();
   self.client.connect(self.host, function() {
-    if (!callback) {
-      debug('no callback, not launching app...')
-      return;
-    }
     debug('connected, launching app...');
     self.client.launch(DefaultMediaReceiver, function(err, player) {
       if (err) {
@@ -49,7 +46,7 @@ Device.prototype.connect = function(callback) {
 
   self.client.on('error', function(err) {
     debug('Error: %s', err.message);
-    setTimeout(self.connect, 100);
+    self.connect();
   });
 };
 
@@ -222,15 +219,19 @@ Device.prototype.changeSubtitlesSize = function(num, callback) {
 };
 
 Device.prototype.close = function(callback) {
-  if ( this.player ) {
-    this.player.close();
-    this.player = null;
-  }
-  if (this.client) {
-    this.client.close();
-    this.client = null;
-  }
-  if (callback) {
+  var self = this;
+  if ( self.player ) {
+    self.stop(function() {
+      debug('closing player');
+      self.player.close(function() {
+        debug('closing client');
+        self.client.close(callback);
+      });
+    });
+  } else if(self.client) {
+    debug('closing client');
+    self.client.close(callback);
+  } else {
     callback();
   }
 };
